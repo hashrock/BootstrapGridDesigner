@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>BootStrap Grid Designer</title>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+
+	<!-- responsiveの前に入れる必要がある -->
+	<style type="text/css">
+	      body {
+	        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+	      }
+	</style>
+
+    <link href="./assets/css/bootstrap.css" rel="stylesheet">
+    <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
+	<link rel="stylesheet" href="./assets/css/font-awesome.css">
+
+    <style>
+
+      .empty{
+        min-height: 200px;
+        /* background: #ccc; */
+		background-image: linear-gradient(bottom, rgb(252,252,252) 12%, rgb(245,245,245) 68%);
+		background-image: -o-linear-gradient(bottom, rgb(252,252,252) 12%, rgb(245,245,245) 68%);
+		background-image: -moz-linear-gradient(bottom, rgb(252,252,252) 12%, rgb(245,245,245) 68%);
+		background-image: -webkit-linear-gradient(bottom, rgb(252,252,252) 12%, rgb(245,245,245) 68%);
+		background-image: -ms-linear-gradient(bottom, rgb(252,252,252) 12%, rgb(245,245,245) 68%);
+
+		background-image: -webkit-gradient(
+			linear,
+			left bottom,
+			left top,
+			color-stop(0.12, rgb(252,252,252)),
+			color-stop(0.68, rgb(245,245,245))
+		);
+      }
+      .devider{
+        float: right;
+    	margin-right:-20px;
+    	top: 0px;
+        width: 20px;
+      	text-align: center;
+      }
+      
+      .empty .contextMenu{
+	    top: 50px;
+	    text-align:center;
+	    position:absolute;
+	    background:#0000ff;
+	    width:300px;
+	    height:50px;
+	    opacity:0.6;
+		display: none;
+      }
+      
+      #dialog-modal{
+		display: none;
+      }
+      
+      
+
+    </style>
+    <script type="text/javascript">
+        var divSize = ["span1", "span2", "span3", "span4", "span5", "span6", "span7", "span8", "span9", "span10", "span11", "span12"];
+        //spanを再計算する
+
+        function setDivSize(jqObj, size) {
+            for (var i = 0; i < divSize.length; i++) {
+                jqObj.removeClass(divSize[i]);
+            }
+            jqObj.addClass(divSize[size]);
+        }
+
+        // spanの値を数値に変換
+        // span1 -> 1
+        function getDivSize(jqObj) {
+            for (var i = 0; i < divSize.length; i++) {
+                if (jqObj.hasClass(divSize[i])) {
+                    return i;
+                }
+            }
+            return -1; //none
+        }
+
+        function getRowMenu() {
+            return '<button class="addText btn">コンテンツの追加</button>';
+        }
+
+		function getDevider(){
+			return '<div class="devider"><span class="toRight"><i class="icon-chevron-right"></i></span><br><span class="toLeft"><i class="icon-chevron-left"></i></span></div>';
+		}
+
+        function resizeDiv(obj, amount) {
+            //変更される二つのDivを取得
+            var rightCol = $(obj).parent().parent();
+            var leftCol = $(obj).parent().parent().next();
+
+            var newRightSize = getDivSize(rightCol) + (1 * amount);
+            var newLeftSize = getDivSize(leftCol) + (-1 * amount);
+
+            //幅0ならキャンセル
+            if (newRightSize == 0 || newLeftSize == 0) {
+                return;
+            }
+
+            setDivSize(rightCol, newRightSize);
+            setDivSize(leftCol, newLeftSize);
+            //二つのDivにspanクラスを再設定
+        }
+
+
+		var addContents = "";
+        $(function () {
+        	$("#dialog-image").click(function(){
+        		addContents = "<img src='http://placekitten.com/500/500'>";
+        		$( "#dialog-modal" ).dialog( "close" );
+        	});
+        	$("#dialog-text").click(function(){
+        		addContents = "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
+        		$( "#dialog-modal" ).dialog( "close" );
+        	});
+        	$("#dialog-grid").click(function(){
+        		addContents = '<div class="row-fluid"><div class="span4 empty"></div><div class="span4 empty"></div><div class="span4 empty"></div></div>';
+        		$( "#dialog-modal" ).dialog( "close" );
+        	});
+        	//Does not work
+            $(".container").delegate(".toRight", "click", function () { resizeDiv(this, 1); });
+            $(".container").delegate(".toLeft", "click", function () { resizeDiv(this, -1); });
+            $(".addText").live("click", function () {
+            	var clicked = $(this);
+            	addContents = "";
+    	        $( "#dialog-modal" ).dialog({
+		            height: 400,
+		            modal: true,
+		            close: function(){
+		            	$( this ).dialog( "close" );
+    	                clicked.parent().prepend(addContents);
+		            }
+		        });
+                
+            });
+            $("#addRow1").click(function () {
+                $("#entry").append('<div class="row"><div class="span12 empty">' + getRowMenu() + '</div></div>');
+            });
+            $("#addRow2").click(function () {
+                $("#entry").append('<div class="row"><div class="span6 empty">' + getRowMenu() + getDevider() + '</div><div class="span6 empty">' + getRowMenu() + '</div></div>');
+            });
+            $("#addRow3").click(function () {
+                $("#entry").append('<div class="row"><div class="span4 empty">' + getRowMenu() + getDevider() +'</div><div class="span4 empty">' + getRowMenu() + getDevider() + '</div><div class="span4 empty">' + getRowMenu() + '</div></div>');
+            });
+        });
+    </script>
+    
+    
+  </head>
+
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">FastBoot</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <div class="container" id="main">
+    
+    	<div id="entry"></div>
+	    <button type="button" id="addRow1" class="btn">グリッド（１列）を追加</button>
+	    <button type="button" id="addRow2" class="btn">グリッド（２列）を追加</button>
+	    <button type="button" id="addRow3" class="btn">グリッド（３列）を追加</button>
+    </div>
+    
+    <div id="dialog-modal" title="Basic modal dialog">
+    	<button type="button" class="btn" id="dialog-image"><i class="icon-camera-retro icon-large"></i><br>画像を追加</button>
+    	<button type="button" class="btn" id="dialog-text"><i class="icon-align-left icon-large"></i><br>文章を追加</button>
+    	<!--<button type="button" class="btn" id="dialog-grid"><i class="icon-table icon-large"></i><br>グリッドを追加（三列）</button>-->
+	</div>
+
+  </body>
+</html>
